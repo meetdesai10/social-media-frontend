@@ -24,7 +24,7 @@ export default function Login() {
       <div className="flex flex-col justify-center items-center gap-5 border-[1px] border-[#dbdbdb] py-10 px-12">
         <Image src={instaLogo} className="w-[250px] py-10" alt="logo" />
         <input
-          type="text" 
+          type="text"
           placeholder="username or email"
           name="userName"
           value={loginDetails?.usernameOrEmail}
@@ -55,7 +55,7 @@ export default function Login() {
       </div>
       <div className="flex flex-col justify-center items-center gap-5 border-[1px] border-[#dbdbdb] py-8 px-[105px] mt-5">
         <p>
-          Don't have a account?{" "}
+          Do not have a account?
           <span className="text-[#0095f6] cursor-pointer">Sign up.</span>
         </p>
       </div>

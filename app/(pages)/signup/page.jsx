@@ -162,7 +162,7 @@ export default function Signup() {
       </div>
       <div className="flex flex-col justify-center items-center gap-5 border-[1px] border-[#dbdbdb] py-8 px-[105px] mt-5">
         <p>
-          Don't have a account?{" "}
+          Do not have a account?{" "}
           <span className="text-[#0095f6] cursor-pointer">Sign in.</span>
         </p>
       </div>
