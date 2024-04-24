@@ -3,14 +3,18 @@ import React, { useState } from "react";
 import { instaLogo } from "@/app/images/Image";
 import Image from "next/image";
 import { FaFacebookSquare } from "react-icons/fa";
+import { toast } from "sonner";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+  const navigate = useRouter();
+  const [loader, setLoader] = useState(false);
   const [loginDetails, setLoginDetails] = useState({
     userName: "",
     password: "",
   });
 
-  console.log("🚀 ~ Login ~ loginDetails:", loginDetails);
   //   save logindetails in the state
   const savedLoginDetailHandler = (e) => {
     const { name, value } = e?.target;
@@ -19,6 +23,60 @@ export default function Login() {
       [name]: value,
     });
   };
+
+  // login handler
+
+  async function loginHandler() {
+    if ([loginDetails?.userName, loginDetails?.password].some((item) => item?.trim() == "")) {
+      return toast.error("all fields are required!!");
+    }
+    setLoader(true);
+    await axios({
+      method: "post",
+      url: "https://socialmedia-mhye.onrender.com/api/v1/users/verifyUser",
+      data: { userName: loginDetails?.userName, password: loginDetails?.password },
+      withCredentials: true
+    }).then(async (res) => {
+      const isVarify = res?.data?.data?.isVarify;
+      if (isVarify) {
+        return await axios({
+          method: "post",
+          url: "https://socialmedia-mhye.onrender.com/api/v1/users/login",
+          data: loginDetails,
+          withCredentials: true
+        }).then((res) => {
+          setLoader(false);
+          const user = res?.data?.data?.loggedInUser;
+          if (res?.data?.success) {
+            localStorage.setItem("user", JSON.stringify({ email: user?.email }));
+            navigate.push("/");
+            toast.success("login successfully!!");
+          }
+        }).catch((error) => {
+          setLoader(false);
+          toast.error(error?.response?.data?.message);
+          setLoader(false);
+        });
+      } else {
+        const email = res?.data?.data?.email;
+        toast.error("you have to verify to login!!");
+        await axios({
+          method: "post",
+          url: "https://socialmedia-mhye.onrender.com/api/v1/users/send-otp-mail",
+          data: { email: email }
+        }).then((res) => {
+          toast.success("enter otp for verification!!");
+          navigate.push(`/verify/${email}`);
+        }).catch((error) => {
+          toast.error(error?.response?.data?.message);
+        });
+      }
+    }).catch((error) => {
+      toast.error(error?.response?.data?.message);
+      setLoader(false);
+    });
+    // 
+  }
   return (
     <div className="bg-white flex flex-col justify-center items-center h-screen">
       <div className="flex flex-col justify-center items-center gap-5 border-[1px] border-[#dbdbdb] py-10 px-12">
@@ -39,8 +97,11 @@ export default function Login() {
           value={loginDetails?.password}
           onChange={savedLoginDetailHandler}
         />
-        <button className="bg-[#4cb5f9] w-full rounded-lg p-2 text-white text-[16px]">
-          Login
+        <button
+          className="bg-[#4cb5f9] w-full rounded-lg h-[45px] text-white text-[16px] flex justify-center items-center"
+          onClick={() => loginHandler()}
+        >
+          {loader ? <div className="loader"></div> : "Login"}
         </button>
         <div className="w-full flex items-center justify-center">
           <div className="w-full h-[1px] bg-[#dbdbdb]"></div>
@@ -53,7 +114,7 @@ export default function Login() {
         </div>
         <p className="text-[#00376b] cursor-pointer">Forget password?</p>
       </div>
-      <div className="flex flex-col justify-center items-center gap-5 border-[1px] border-[#dbdbdb] py-8 px-[105px] mt-5">
+      <div className="flex flex-col justify-center items-center gap-5 border-[1px] border-[#dbdbdb] py-8 px-[105px] mt-5" onClick={() => navigate.push("/signup")}>
         <p>
           Do not have a account?
           <span className="text-[#0095f6] cursor-pointer">Sign up.</span>

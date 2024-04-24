@@ -31,7 +31,7 @@ export default function Signup() {
 
   //   signup handler
 
-  const signupHandler = () => {
+  const signupHandler = async () => {
     // all conditions for fields
 
     if (
@@ -57,15 +57,27 @@ export default function Signup() {
 
     // loader start
     setLoader(true);
-    axios({
+
+    // call api  
+
+    await axios({
       method: "post",
       url: "https://socialmedia-mhye.onrender.com/api/v1/users/register",
       data: signupDetails,
     })
-      .then((res) => {
+      .then(async (res) => {
         if (res?.data?.success) {
-          toast.success("login successfully!!");
-          navigate.push("/dashboard");
+          const email = res?.data?.data?.email;
+          await axios({
+            method: "post",
+            url: "https://socialmedia-mhye.onrender.com/api/v1/users/send-otp-mail",
+            data: { email: email }
+          }).then((res) => {
+            toast.success("enter otp for verification!!");
+            navigate.push(`/verify/${email}`);
+          }).catch((error) => {
+            toast.error(error?.response?.data?.message);
+          });
         }
         setLoader(false);
       })
@@ -160,7 +172,7 @@ export default function Signup() {
         </button>
         <p className="text-[#00376b] cursor-pointer">Forget password?</p>
       </div>
-      <div className="flex flex-col justify-center items-center gap-5 border-[1px] border-[#dbdbdb] py-8 px-[105px] mt-5">
+      <div className="flex flex-col justify-center items-center gap-5 border-[1px] border-[#dbdbdb] py-8 px-[105px] mt-5" onClick={() => navigate.push("/login")} >
         <p>
           Do not have a account?{" "}
           <span className="text-[#0095f6] cursor-pointer">Sign in.</span>
