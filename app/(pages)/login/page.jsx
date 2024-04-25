@@ -6,6 +6,7 @@ import { FaFacebookSquare } from "react-icons/fa";
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { BACKEND_URL } from "@/app/config";
 
 export default function Login() {
   const navigate = useRouter();
@@ -33,7 +34,7 @@ export default function Login() {
     setLoader(true);
     await axios({
       method: "post",
-      url: "https://socialmedia-mhye.onrender.com/api/v1/users/verifyUser",
+      url: `${BACKEND_URL}/api/v1/users/verifyUser`,
       data: { userName: loginDetails?.userName, password: loginDetails?.password },
       withCredentials: true
     }).then(async (res) => {
@@ -41,7 +42,7 @@ export default function Login() {
       if (isVarify) {
         return await axios({
           method: "post",
-          url: "https://socialmedia-mhye.onrender.com/api/v1/users/login",
+          url: `${BACKEND_URL}/api/v1/users/login`,
           data: loginDetails,
           withCredentials: true
         }).then((res) => {
@@ -66,7 +67,7 @@ export default function Login() {
           data: { email: email }
         }).then((res) => {
           toast.success("enter otp for verification!!");
-          navigate.push(`/verify/${email}`);
+          navigate.push(`/ verify / ${{ email, path: "/login" }} `);
         }).catch((error) => {
           toast.error(error?.response?.data?.message);
         });
@@ -112,7 +113,7 @@ export default function Login() {
           <FaFacebookSquare className="text-[#385185] text-[30px]" />
           <p className="text-[#385185] text-[18px]">Login With Facebook</p>
         </div>
-        <p className="text-[#00376b] cursor-pointer">Forget password?</p>
+        <p className="text-[#00376b] cursor-pointer" onClick={() => navigate.push("/forget-password")}>Forget password?</p>
       </div>
       <div className="flex flex-col justify-center items-center gap-5 border-[1px] border-[#dbdbdb] py-8 px-[105px] mt-5" onClick={() => navigate.push("/signup")}>
         <p>
@@ -122,4 +123,4 @@ export default function Login() {
       </div>
     </div>
   );
-}
+};

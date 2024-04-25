@@ -6,6 +6,7 @@ import { FaFacebookSquare } from "react-icons/fa";
 import { toast } from "sonner";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { BACKEND_URL } from "@/app/config";
 
 export default function Signup() {
   const navigate = useRouter();
@@ -62,7 +63,7 @@ export default function Signup() {
 
     await axios({
       method: "post",
-      url: "https://socialmedia-mhye.onrender.com/api/v1/users/register",
+      url: `${BACKEND_URL}/api/v1/users/register`,
       data: signupDetails,
     })
       .then(async (res) => {
@@ -70,11 +71,17 @@ export default function Signup() {
           const email = res?.data?.data?.email;
           await axios({
             method: "post",
-            url: "https://socialmedia-mhye.onrender.com/api/v1/users/send-otp-mail",
+            url: `${BACKEND_URL}/api/v1/users/send-otp-mail`,
             data: { email: email }
           }).then((res) => {
+            const urlData = {
+              email: email,
+              path: "/login"
+            };
+            const dataString = JSON.stringify(urlData);
+
             toast.success("enter otp for verification!!");
-            navigate.push(`/verify/${email}`);
+            navigate.push(`/verify/${encodeURIComponent(dataString)}`);
           }).catch((error) => {
             toast.error(error?.response?.data?.message);
           });
@@ -170,7 +177,6 @@ export default function Signup() {
         >
           {loader ? <div className="loader"></div> : "Sign up"}
         </button>
-        <p className="text-[#00376b] cursor-pointer">Forget password?</p>
       </div>
       <div className="flex flex-col justify-center items-center gap-5 border-[1px] border-[#dbdbdb] py-8 px-[105px] mt-5" onClick={() => navigate.push("/login")} >
         <p>

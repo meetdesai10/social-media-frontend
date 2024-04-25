@@ -5,11 +5,13 @@ import Image from 'next/image';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { BACKEND_URL } from '@/app/config';
 
 export default function Verify({ params }) {
-    const email = decodeURIComponent(params?.email);
+    const email = JSON.parse(decodeURIComponent(params?.email));
     const [otp, setOtp] = useState(undefined);
     const router = useRouter();
+    const { pathname } = router;
     const [loader, setLoader] = useState(false);
     // const userEmail = router.query.email;
 
@@ -28,12 +30,16 @@ export default function Verify({ params }) {
         setLoader(true);
         await axios({
             method: "post",
-            url: `https://socialmedia-mhye.onrender.com/api/v1/users/verify-otp/${otp}`,
-            data: { email: email }
+            url: `${BACKEND_URL}/api/v1/users/verify-otp/${otp}`,
+            data: { email: email?.email }
         }).then((res) => {
             setLoader(false);
-            toast.success("verification successfully now you can login!!");
-            router.push("/login");
+            toast.success("otp verification successfully!!");
+            if (email?.path == "/login") {
+                router.push(`${email?.path}`);
+            } else {
+                router.push(`${email?.path}/${email?.email}`);
+            }
         }).catch((error) => {
             setLoader(false);
             toast.error(error?.response?.data?.message);

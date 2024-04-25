@@ -7,22 +7,24 @@ export default function Page() {
   const router = useRouter();
   // check uswr login or not
 
-  const handleStorageChange = () => {
-    if (!localStorage.getItem("user")) {
-      return router.push("/login");
-    }
-  };
-
-  useEffect(() => {
+  const handleStorageChange = useEffect(() => {
     const userData = localStorage.getItem("user");
     if (!userData) {
       return router.push("/login");
     }
 
-    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("storage", () => {
+      if (!localStorage.getItem("user")) {
+        return router.push("/login");
+      }
+    });
 
     return () => {
-      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("storage", () => {
+        if (!localStorage.getItem("user")) {
+          return router.push("/login");
+        }
+      });
     };
   }, [router]); // Add router to dependency array
   return (
