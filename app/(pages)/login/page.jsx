@@ -64,11 +64,19 @@ export default function Login() {
         await axios({
           method: "post",
           url: "https://socialmedia-mhye.onrender.com/api/v1/users/send-otp-mail",
-          data: { email: email }
+          data: { email: email },
+          withCredentials: true
         }).then((res) => {
+          setLoader(false);
           toast.success("enter otp for verification!!");
-          navigate.push(`/ verify / ${{ email, path: "/login" }} `);
+          const urlData = {
+            email: email,
+            path: "/login"
+          };
+          const dataString = JSON.stringify(urlData);
+          navigate.push(`/verify/${encodeURIComponent(dataString)} `);
         }).catch((error) => {
+          setLoader(false);
           toast.error(error?.response?.data?.message);
         });
       }
