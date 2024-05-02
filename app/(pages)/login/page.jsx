@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { instaLogo } from "@/app/images/Image";
 import Image from "next/image";
 import { FaFacebookSquare } from "react-icons/fa";
@@ -84,8 +84,16 @@ export default function Login() {
       toast.error(error?.response?.data?.message);
       setLoader(false);
     });
-    // 
+
+
   }
+
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      navigate.push("/dashboard");
+    }
+  }, []);
   return (
     <div className="bg-white flex flex-col justify-center items-center h-screen">
       <div className="flex flex-col justify-center items-center gap-5 border-[1px] border-[#dbdbdb] py-10 px-12">

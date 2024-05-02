@@ -4,20 +4,19 @@ import { instaLogo } from '@/app/images/Image';
 import axios from 'axios';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import validator from 'validator';
 
 export default function SetPassword({ params }) {
     const router = useRouter();
-    const email = decodeURIComponent(params?.email);    
+    const email = decodeURIComponent(params?.email);
     const [newPasswordDetails, setNewPasswordDetails] = useState({
         newPassword: "",
         confirmPassword: "",
         email
     });
     const [loader, setLoader] = useState(false);
-
     // setNewPasswordDetailsHandler
     async function setNewPasswordDetailsHandler() {
         if (!validator.isEmail(email)) {
@@ -44,6 +43,13 @@ export default function SetPassword({ params }) {
             toast.error(error?.response?.data?.message);
         });
     }
+
+    useEffect(() => {
+        const user = localStorage.getItem("user");
+        if (user) {
+            navigate.push("/dashboard");
+        }
+    }, []);
     return (
         <div className="bg-white flex flex-col justify-center items-center h-screen">
             <div className="flex flex-col justify-center items-center gap-5 border-[1px] border-[#dbdbdb] py-10 px-12">

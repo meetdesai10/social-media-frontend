@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { instaLogo } from '@/app/images/Image';
 import Image from 'next/image';
 import { toast } from 'sonner';
@@ -7,6 +7,7 @@ import validator from 'validator';
 import axios from 'axios';
 import { BACKEND_URL } from '@/app/config';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function ForgetPassword() {
     const navigate = useRouter();
@@ -29,7 +30,6 @@ export default function ForgetPassword() {
             data: { email: email },
             withCredentials: true
         }).then((res) => {
-            console.log("🚀 ~ forgetPasswordHandler ~ res:", res);
             setLoader(false);
             toast.success("enter otp for verification!!");
             const urlData = {
@@ -40,11 +40,16 @@ export default function ForgetPassword() {
 
             navigate.push(`/verify/${encodeURIComponent(dataString)}`);
         }).catch((error) => {
-            console.log("🚀 ~ forgetPasswordHandler ~ error:", error);
             setLoader(false);
             toast.error(error?.response?.data?.message);
         });
     }
+    useEffect(() => {
+        const user = localStorage.getItem("user");
+        if (user) {
+            navigate.push("/dashboard");
+        }
+    }, []);
     return (
         <div className="bg-white flex flex-col justify-center items-center h-screen">
             <div className="flex flex-col justify-center items-center gap-5 border-[1px] border-[#dbdbdb] py-10 px-12">
@@ -63,8 +68,10 @@ export default function ForgetPassword() {
                 >
                     {loader ? <div className="loader"></div> : "send otp"}
                 </button>
+                <Link href={"/login"}>
 
-
+                    <p>Bacl to Login</p>
+                </Link>
             </div>
         </div>
     );

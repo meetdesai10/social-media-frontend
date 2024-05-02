@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { instaLogo } from '@/app/images/Image';
 import Image from 'next/image';
 import { toast } from 'sonner';
@@ -31,7 +31,8 @@ export default function Verify({ params }) {
         await axios({
             method: "post",
             url: `${BACKEND_URL}/api/v1/users/verify-otp/${otp}`,
-            data: { email: email?.email }
+            data: { email: email?.email },
+            withCredentials: true
         }).then((res) => {
             setLoader(false);
             toast.success("otp verification successfully!!");
@@ -45,6 +46,13 @@ export default function Verify({ params }) {
             toast.error(error?.response?.data?.message);
         });
     }
+
+    useEffect(() => {
+        const user = localStorage.getItem("user");
+        if (user) {
+            navigate.push("/dashboard");
+        }
+    }, []);
     return (
         <div>
             <div className="bg-white flex flex-col justify-center items-center h-screen">
